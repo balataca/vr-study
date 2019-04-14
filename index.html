@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>poc-vr</title>
+    <meta name="description" content="poc-vr">
+    <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+    <script src="https://rawgit.com/blairmacintyre/aframe-look-at-billboard-component/master/dist/aframe-look-at-billboard-component.min.js"></script>
+    <script>
+      let isAnimationRunning = false;
+      let elapsedTime = null;
+
+      function start(timestamp) {
+        if (!elapsedTime) elapsedTime = timestamp;
+        const progress = 10 - ((timestamp - elapsedTime) / 1000); 
+        const position = `${progress} .1 -10`;
+        document.getElementById('bus').setAttribute('position', position);
+     
+        if (progress > 1 && isAnimationRunning) {
+          requestAnimationFrame(start);
+        }
+      }
+
+      function reset() {
+        isAnimationRunning = false
+        document.getElementById('bus').setAttribute('position', '10 .1 -10');
+      }
+
+      AFRAME.registerComponent('cursor-listener', {
+        init: function () {
+          const COLORS = ['red', 'green', 'blue'];
+          let lastIndex = -1;
+          this.el.addEventListener('click', function (evt) {
+            lastIndex = (lastIndex + 1) % COLORS.length;
+            this.setAttribute('material', 'color', COLORS[lastIndex]);
+     
+            if (isAnimationRunning) {
+              elapsedTime = null;
+              reset();
+            } else {
+              isAnimationRunning = true;
+              requestAnimationFrame(start);
+            }
+
+            this.setAttribute('value', isAnimationRunning ? 'Reset' : 'Start');
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a-scene>
+      <a-assets>
+        <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
+        <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
+        <a-asset-item id="carModel" src="static_assets/3D_models/car/scene.gltf"></a-asset-item>
+        <a-asset-item id="busModel" src="static_assets/3D_models/bus/scene.gltf"></a-asset-item>
+      </a-assets>
+
+      <!-- Camera -->
+      <a-entity 
+        camera="active: true" 
+        look-controls 
+        wasd-controls 
+        position="0 1.6 0" 
+        data-aframe-default-camera
+      >
+        <a-entity text="value: POINTS: 300; color: red; width: .7;" position="-0.5 .37 -0.5">
+        </a-entity>
+        <a-entity 
+          cursor="fuse: true; fuseTimeout: 500"
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: #fff; shader: flat"
+        >
+        </a-entity>
+      </a-entity>
+
+      <!-- Billboard -->
+      <a-text
+        cursor-listener
+        geometry="primitive: plane; width: 2; height: 1;"
+        align="center"
+        color="#000"
+        value="Start" 
+        position="0 2.5 -4"
+        billboard
+      ></a-text>
+
+      <!-- Car -->
+      <a-entity id="car" gltf-model="#carModel" position="0 .1 -10" scale=".45 .45 .45"></a-entity>
+    
+      <!-- Bus -->
+      <a-entity id="bus" gltf-model="#busModel" position="10 .1 -10" scale="1 1 1"></a-entity>
+
+      <!-- Background sky. -->
+      <a-sky height="2048" radius="30" src="#skyTexture" theta-length="90" width="2048"></a-sky>
+
+      <!-- Ground. -->
+      <a-circle src="#groundTexture" rotation="-90 0 0" radius="32"></a-circle>
+    </a-scene>
+  </body>
+</html>
