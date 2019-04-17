@@ -6,6 +6,7 @@
     <meta name="description" content="poc-vr">
     <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
     <script src="https://rawgit.com/blairmacintyre/aframe-look-at-billboard-component/master/dist/aframe-look-at-billboard-component.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
     <script>
       let isAnimationRunning = false;
       let elapsedTime = null;
@@ -49,12 +50,13 @@
     </script>
   </head>
   <body>
-    <a-scene>
+    <a-scene stats inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
       <a-assets>
         <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
         <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
         <a-asset-item id="carModel" src="static_assets/3D_models/car/scene.gltf"></a-asset-item>
         <a-asset-item id="busModel" src="static_assets/3D_models/bus/scene.gltf"></a-asset-item>
+        <a-asset-item id="charModel" src="static_assets/3D_models/char/char.glb"></a-asset-item> 
       </a-assets>
 
       <!-- Camera -->
@@ -93,6 +95,16 @@
       <!-- Bus -->
       <a-entity id="bus" gltf-model="#busModel" position="10 .1 -10" scale="1 1 1"></a-entity>
 
+      <!-- Char -->
+      <a-entity    
+        id ="char"
+        gltf-model="#charModel"
+        scale="1 1 1"
+        position="2 .1 -4"
+        rotation="0 0 0"
+        animation-mixer="clip: Take 001"
+      ></a-entity> 
+    
       <!-- Background sky. -->
       <a-sky height="2048" radius="30" src="#skyTexture" theta-length="90" width="2048"></a-sky>
 
