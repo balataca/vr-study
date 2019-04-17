@@ -54,9 +54,10 @@
       <a-assets>
         <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
         <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
-        <a-asset-item id="carModel" src="static_assets/3D_models/car/scene.gltf"></a-asset-item>
-        <a-asset-item id="busModel" src="static_assets/3D_models/bus/scene.gltf"></a-asset-item>
+        <!-- <a-asset-item id="carModel" src="static_assets/3D_models/car/scene.gltf"></a-asset-item> -->
+        <!-- <a-asset-item id="busModel" src="static_assets/3D_models/bus/scene.gltf"></a-asset-item> -->
         <a-asset-item id="charModel" src="static_assets/3D_models/char/char.glb"></a-asset-item> 
+        <!-- <a-asset-item id="junkratModel" src="static_assets/3D_models/junkrat/scene.gltf"></a-asset-item> -->
       </a-assets>
 
       <!-- Camera -->
@@ -101,9 +102,17 @@
         gltf-model="#charModel"
         scale="1 1 1"
         position="2 .1 -4"
-        rotation="0 0 0"
         animation-mixer="clip: Take 001"
-      ></a-entity> 
+      ></a-entity>
+      
+      <!-- Junkrat -->
+      <a-entity    
+        id ="junkrat"
+        gltf-model="#junkratModel"
+        scale=".003 .003 .003"
+        position="2 .1 -4"
+        animation-mixer="clip: Take 001"
+      ></a-entity>
     
       <!-- Background sky. -->
       <a-sky height="2048" radius="30" src="#skyTexture" theta-length="90" width="2048"></a-sky>
