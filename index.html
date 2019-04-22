@@ -7,24 +7,44 @@
     <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
     <script src="https://rawgit.com/blairmacintyre/aframe-look-at-billboard-component/master/dist/aframe-look-at-billboard-component.min.js"></script>
     <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.rawgit.com/donmccurdy/aframe-physics-system/v3.3.0/dist/aframe-physics-system.min.js"></script>
     <script>
-      let isAnimationRunning = false;
-      let elapsedTime = null;
-
-      function start(timestamp) {
-        if (!elapsedTime) elapsedTime = timestamp;
-        const progress = 10 - ((timestamp - elapsedTime) / 1000); 
-        const position = `${progress} .1 -10`;
-        document.getElementById('bus').setAttribute('position', position);
+      let started = false;
      
-        if (progress > 1 && isAnimationRunning) {
-          requestAnimationFrame(start);
-        }
+      const startScene = () => {
+        const truck = document.getElementById('truck');
+        const car = document.getElementById('car');
+     
+        impulse({ el: truck, position: '150 0 0' });
+        impulse({ el: car, position: '0 0 40' });
       }
 
-      function reset() {
-        isAnimationRunning = false
-        document.getElementById('bus').setAttribute('position', '10 .1 -10');
+      
+      const impulse = ({ el, position = '0 0 0'}) => {
+        const coords = position.split(' ').map(num => parseFloat(num));
+        
+        el.body.applyImpulse(
+          /* impulse */        
+          new CANNON.Vec3(coords[0], coords[1], coords[2]),
+          /* world position */ 
+          new CANNON.Vec3().copy({
+            x: 0,
+            y: 0,
+            z: 0
+          })
+        );
+      }
+
+
+      const reset = () => {
+        const car = document.getElementById('car');
+        const truck = document.getElementById('truck');
+        
+        car.body.position.set(-3, 0.1, -17);
+        car.body.quaternion.set(0,0,0,1);
+        
+        truck.body.position.set(-11, 0.1, 0);
+        truck.body.quaternion.set(0,1,0,1);
       }
 
       AFRAME.registerComponent('cursor-listener', {
@@ -35,15 +55,15 @@
             lastIndex = (lastIndex + 1) % COLORS.length;
             this.setAttribute('material', 'color', COLORS[lastIndex]);
      
-            if (isAnimationRunning) {
-              elapsedTime = null;
+            if (started) {
+              started = false;
               reset();
             } else {
-              isAnimationRunning = true;
-              requestAnimationFrame(start);
+              started = true;
+              startScene();
             }
 
-            this.setAttribute('value', isAnimationRunning ? 'Reset' : 'Start');
+            this.setAttribute('value', started ? 'Reset' : 'Start');
           });
         }
       });
@@ -52,19 +72,22 @@
   <body>
     <a-scene stats inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
       <a-assets>
-        <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg" crossorigin="anonymous">
-        <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
-        <!-- <a-asset-item id="carModel" src="static_assets/3D_models/car/scene.gltf"></a-asset-item> -->
-        <!-- <a-asset-item id="busModel" src="static_assets/3D_models/bus/scene.gltf"></a-asset-item> -->
-        <a-asset-item id="charModel" src="static_assets/3D_models/char/char.glb"></a-asset-item> 
-        <!-- <a-asset-item id="junkratModel" src="static_assets/3D_models/junkrat/scene.gltf"></a-asset-item> -->
+        <img id="groundTexture" src="static_assets/textures/floor.jpg" crossorigin="anonymous">
+        <img id="sky" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
+        <a-asset-item id="city-model" src="static_assets/models/city/city.glb" crossorigin="anonymous"></a-asset-item>
+        <a-asset-item id="car-model" src="static_assets/models/car/car.glb"></a-asset-item>
+        <a-asset-item id="truck-model" src="static_assets/models/truck/truck.glb"></a-asset-item>
+        <!-- <a-asset-item id="char-model" src="static_assets/models/char/char.glb"></a-asset-item>  -->
+        <a-asset-item id="junkrat-model" src="static_assets/models/junkrat/scene.gltf"></a-asset-item>
       </a-assets>
 
-      <!-- Camera -->
+      <!-- Camera 
+        wasd-controls 
+      -->
       <a-entity 
         camera="active: true" 
-        look-controls 
-        wasd-controls 
+        look-controls
+        wasd-controls
         position="0 1.6 0" 
         data-aframe-default-camera
       >
@@ -79,10 +102,19 @@
         </a-entity>
       </a-entity>
 
+      <!-- Buildings -->
+      <a-entity
+        id="city"
+        gltf-model="#city-model"
+        position="0 -0.1 0"
+        scale="1 1 1"
+      ></a-entity>
+
       <!-- Billboard -->
       <a-text
         cursor-listener
         geometry="primitive: plane; width: 2; height: 1;"
+        material="color: blue;"
         align="center"
         color="#000"
         value="Start" 
@@ -91,34 +123,41 @@
       ></a-text>
 
       <!-- Car -->
-      <a-entity id="car" gltf-model="#carModel" position="0 .1 -10" scale=".45 .45 .45"></a-entity>
+      <a-entity 
+        id="car" 
+        gltf-model="#car-model" 
+        position="-3 0.1 -17"
+        scale=".01 .01 .01" 
+        dynamic-body="shape: box; mass: 2;"
+      ></a-entity>
     
-      <!-- Bus -->
-      <a-entity id="bus" gltf-model="#busModel" position="10 .1 -10" scale="1 1 1"></a-entity>
+      <!-- Truck -->
+      <a-entity 
+        id="truck" 
+        gltf-model="#truck-model" 
+        position="-11 0.1 0"
+        rotation="0 90 0" 
+        scale="1 1 1" 
+        dynamic-body="shape: box; mass: 10;"
+      ></a-entity>
 
       <!-- Char -->
-      <a-entity    
+      <!-- <a-entity    
         id ="char"
-        gltf-model="#charModel"
+        gltf-model="#char-model"
         scale="1 1 1"
-        position="2 .1 -4"
+        position="0 .1 -10"
         animation-mixer="clip: Take 001"
-      ></a-entity>
-      
-      <!-- Junkrat -->
-      <a-entity    
-        id ="junkrat"
-        gltf-model="#junkratModel"
-        scale=".003 .003 .003"
-        position="2 .1 -4"
-        animation-mixer="clip: Take 001"
-      ></a-entity>
+      ></a-entity> -->
+
+      <!-- Lights -->
+      <!-- <a-entity light="type: ambient; color: #CCC; intensity: 3;" position="0 40 0"></a-entity> -->
     
       <!-- Background sky. -->
-      <a-sky height="2048" radius="30" src="#skyTexture" theta-length="90" width="2048"></a-sky>
+      <a-sky height="2048" radius="55" src="#sky" theta-length="90" width="2048"></a-sky>
 
       <!-- Ground. -->
-      <a-circle src="#groundTexture" rotation="-90 0 0" radius="32"></a-circle>
+      <a-plane color="#4d4d4d" width="120" height="120" rotation="-90 0 0" static-body></a-plane>
     </a-scene>
   </body>
 </html>
