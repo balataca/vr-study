@@ -42,9 +42,13 @@
         
         truck.body.position.set(-3, 0.1, -17);
         truck.body.quaternion.set(0,0,0,1);
+        truck.body.initQuaternion.set(0,0,0,1);
+        truck.body.velocity.setZero();
         
         car.body.position.set(-11, 0.1, 0);
         car.body.quaternion.set(0,1,0,1);
+        car.body.initQuaternion.set(0,0,0,1);
+        car.body.velocity.setZero();
       }
 
       AFRAME.registerComponent('cursor-listener', {
@@ -72,8 +76,8 @@
   <body>
     <a-scene stats inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
       <a-assets>
-        <img id="sky" src="https://cdn.aframe.io/a-painter/images/sky.jpg" crossorigin="anonymous">
-        <a-asset-item id="city-model" src="static_assets/models/city/city.glb" crossorigin="anonymous"></a-asset-item>
+        <img id="sky" src="static_assets/images/sky.jpeg">
+        <a-asset-item id="city-model" src="static_assets/models/city/city.glb"></a-asset-item>
         <a-asset-item id="car-model" src="static_assets/models/car/car.glb"></a-asset-item>
         <a-asset-item id="truck-model" src="static_assets/models/truck/truck.glb"></a-asset-item>
         <!-- <a-asset-item id="char-model" src="static_assets/models/char/char.glb"></a-asset-item>  -->
@@ -83,15 +87,13 @@
         wasd-controls 
       -->
       <a-entity 
-        id="camera1"
+        id="camera1" 
         camera="active: true"
         look-controls
         wasd-controls
-        position="0 1.6 0" 
-        data-aframe-default-camera
+        position="5.02497 1.6 4.5329"
+        rotation="0 37 0" 
       >
-        <a-entity text="value: POINTS: 300; color: red; width: .7;" position="-0.5 .37 -0.5">
-        </a-entity>
         <a-entity 
           cursor="fuse: true; fuseTimeout: 500"
           position="0 0 -1"
@@ -107,17 +109,19 @@
         gltf-model="#city-model"
         position="0 -0.1 0"
         scale="1 1 1"
+        shadow="cast: true; receive: true;"
       ></a-entity>
 
       <!-- Billboard -->
       <a-text
+        id="billboard"
         cursor-listener
         geometry="primitive: plane; width: 2; height: 1;"
         material="color: blue;"
         align="center"
         color="#000"
         value="Start" 
-        position="0 2.5 -4"
+        position="3.26134 3 2.2635"
         billboard
       ></a-text>
 
@@ -127,7 +131,8 @@
         gltf-model="#truck-model" 
         position="-3 0.1 -17"
         scale="1 1 1" 
-        dynamic-body="shape: box; mass: 10;; sphereRadius: NaN"
+        dynamic-body="shape: box; mass: 10;"
+        shadow="cast: true; receive: true;"
       ></a-entity>
     
       <!-- Car -->
@@ -135,9 +140,10 @@
         id="car" 
         gltf-model="#car-model" 
         position="-11 0.1 0"
-        rotation="0 90 0"
+        rotation="0 95 0"
         scale=".01 .01 .01"  
         dynamic-body="shape: box; mass: 2;"
+        shadow="cast: true; receive: true;"
       ></a-entity>
 
       <!-- Char -->
@@ -150,13 +156,26 @@
       ></a-entity> -->
 
       <!-- Lights -->
-      <!-- <a-entity light="type: ambient; color: #CCC; intensity: 3;" position="0 40 0"></a-entity> -->
-    
+      <a-entity light="type: ambient; color: #BBB; intensity: .8;"></a-entity>
+      <a-entity
+        id="spot"
+        light="type: spot; color: #b7815b; intensity: 1; angle: 120; castShadow: true; target: #city; shadowMapHeight: 4096; shadowMapWidth: 4096;" 
+        position="-47.00783 33.87889 -14.42622" 
+        target="#city"
+      ></a-entity>
+      
       <!-- Background sky. -->
-      <a-sky height="2048" radius="55" src="#sky" theta-length="90" width="2048"></a-sky>
+      <a-sky height="2048" radius="60" src="#sky" theta-length="170" width="2048"></a-sky>
 
       <!-- Ground. -->
-      <a-plane color="#4d4d4d" width="120" height="120" rotation="-90 0 0" static-body></a-plane>
+      <a-plane 
+        color="#4d4d4d" 
+        width="120" 
+        height="120" 
+        rotation="-90 0 0" 
+        static-body
+        shadow="cast: true; receive: true;"
+      ></a-plane>
     </a-scene>
   </body>
 </html>
