@@ -15,8 +15,8 @@
         const truck = document.getElementById('truck');
         const car = document.getElementById('car');
      
-        impulse({ el: truck, position: '150 0 0' });
-        impulse({ el: car, position: '0 0 40' });
+        impulse({ el: car, position: '30 0 0' });
+        impulse({ el: truck, position: '0 0 200' });
       }
 
       
@@ -40,11 +40,11 @@
         const car = document.getElementById('car');
         const truck = document.getElementById('truck');
         
-        car.body.position.set(-3, 0.1, -17);
-        car.body.quaternion.set(0,0,0,1);
+        truck.body.position.set(-3, 0.1, -17);
+        truck.body.quaternion.set(0,0,0,1);
         
-        truck.body.position.set(-11, 0.1, 0);
-        truck.body.quaternion.set(0,1,0,1);
+        car.body.position.set(-11, 0.1, 0);
+        car.body.quaternion.set(0,1,0,1);
       }
 
       AFRAME.registerComponent('cursor-listener', {
@@ -83,7 +83,8 @@
         wasd-controls 
       -->
       <a-entity 
-        camera="active: true" 
+        id="camera1"
+        camera="active: true"
         look-controls
         wasd-controls
         position="0 1.6 0" 
@@ -120,23 +121,23 @@
         billboard
       ></a-text>
 
-      <!-- Car -->
-      <a-entity 
-        id="car" 
-        gltf-model="#car-model" 
-        position="-3 0.1 -17"
-        scale=".01 .01 .01" 
-        dynamic-body="shape: box; mass: 2;"
-      ></a-entity>
-    
       <!-- Truck -->
       <a-entity 
         id="truck" 
         gltf-model="#truck-model" 
-        position="-11 0.1 0"
-        rotation="0 90 0" 
+        position="-3 0.1 -17"
         scale="1 1 1" 
-        dynamic-body="shape: box; mass: 10;"
+        dynamic-body="shape: box; mass: 10;; sphereRadius: NaN"
+      ></a-entity>
+    
+      <!-- Car -->
+      <a-entity 
+        id="car" 
+        gltf-model="#car-model" 
+        position="-11 0.1 0"
+        rotation="0 90 0"
+        scale=".01 .01 .01"  
+        dynamic-body="shape: box; mass: 2;"
       ></a-entity>
 
       <!-- Char -->
