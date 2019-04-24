@@ -11,9 +11,11 @@
     <script>
       let started = false;
      
-      const startScene = () => {
+      const start = () => {
         const truck = document.getElementById('truck');
         const car = document.getElementById('car');
+
+        car.addEventListener('collide', car.components.sound.playSound);
      
         impulse({ el: car, position: '30 0 0' });
         impulse({ el: truck, position: '0 0 200' });
@@ -24,9 +26,7 @@
         const coords = position.split(' ').map(num => parseFloat(num));
         
         el.body.applyImpulse(
-          /* impulse */        
           new CANNON.Vec3(coords[0], coords[1], coords[2]),
-          /* world position */ 
           new CANNON.Vec3().copy({
             x: 0,
             y: 0,
@@ -39,13 +39,15 @@
       const reset = () => {
         const car = document.getElementById('car');
         const truck = document.getElementById('truck');
+
+        car.removeEventListener('collide', car.components.sound.playSound)
         
         truck.body.position.set(-3, 0.1, -17);
         truck.body.quaternion.set(0,0,0,1);
         truck.body.initQuaternion.set(0,0,0,1);
         truck.body.velocity.setZero();
         
-        car.body.position.set(-11, 0.1, 0);
+        car.body.position.set(-11, 0.1, 1.4);
         car.body.quaternion.set(0,1,0,1);
         car.body.initQuaternion.set(0,0,0,1);
         car.body.velocity.setZero();
@@ -64,7 +66,7 @@
               reset();
             } else {
               started = true;
-              startScene();
+              start();
             }
 
             this.setAttribute('value', started ? 'Reset' : 'Start');
@@ -78,9 +80,9 @@
       <a-assets>
         <img id="sky" src="static_assets/images/sky.jpeg">
         <a-asset-item id="city-model" src="static_assets/models/city/city.glb"></a-asset-item>
-        <a-asset-item id="car-model" src="static_assets/models/car/car.glb"></a-asset-item>
+        <a-asset-item id="car-model" src="static_assets/models/car/scene.gltf"></a-asset-item>
         <a-asset-item id="truck-model" src="static_assets/models/truck/truck.glb"></a-asset-item>
-        <!-- <a-asset-item id="char-model" src="static_assets/models/char/char.glb"></a-asset-item>  -->
+        <a-asset-item id="traffic-sign-model" src="static_assets/models/traffic_sign/scene.gltf"></a-asset-item>
       </a-assets>
 
       <!-- Camera 
@@ -103,7 +105,7 @@
         </a-entity>
       </a-entity>
 
-      <!-- Buildings -->
+      <!-- City -->
       <a-entity
         id="city"
         gltf-model="#city-model"
@@ -125,11 +127,21 @@
         billboard
       ></a-text>
 
+      <!-- Traffic Sign -->
+      <a-entity
+        id="traffic-sign" rotation="0 -90 0"
+        gltf-model="#traffic-sign-model"
+        position="-5.8149 0.1 4.26463"
+        scale=".01 .01 .01"
+        shadow="cast: true; receive: true;"
+      >
+      </a-entity>
+
       <!-- Truck -->
       <a-entity 
         id="truck" 
         gltf-model="#truck-model" 
-        position="-3 0.1 -17"
+        position="-3 0.10796 -16.97038"
         scale="1 1 1" 
         dynamic-body="shape: box; mass: 10;"
         shadow="cast: true; receive: true;"
@@ -139,27 +151,19 @@
       <a-entity 
         id="car" 
         gltf-model="#car-model" 
-        position="-11 0.1 0"
-        rotation="0 95 0"
-        scale=".01 .01 .01"  
+        position="-11 0.1 1.4"
+        rotation="0 96 0"
+        scale="1 1 1"  
         dynamic-body="shape: box; mass: 2;"
         shadow="cast: true; receive: true;"
+        sound="src: url(static_assets/sounds/car_crash.mp3);"
       ></a-entity>
 
-      <!-- Char -->
-      <!-- <a-entity    
-        id ="char"
-        gltf-model="#char-model"
-        scale="1 1 1"
-        position="0 .1 -10"
-        animation-mixer="clip: Take 001"
-      ></a-entity> -->
-
       <!-- Lights -->
-      <a-entity light="type: ambient; color: #BBB; intensity: .8;"></a-entity>
+      <a-entity light="type: ambient; color: #BBB; intensity: 1;"></a-entity>
       <a-entity
         id="spot"
-        light="type: spot; color: #b7815b; intensity: 1; angle: 120; castShadow: true; target: #city; shadowMapHeight: 4096; shadowMapWidth: 4096;" 
+        light="type: spot; distance: 100; color: #b7815b; intensity: 1; angle: 120; castShadow: true; target: #city; shadowMapHeight: 1024; shadowMapWidth: 1024;" 
         position="-47.00783 33.87889 -14.42622" 
         target="#city"
       ></a-entity>
