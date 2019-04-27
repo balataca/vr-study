@@ -1,8 +1,6 @@
-# poc-vr
+# vr-study
 
-poc-vr.
-
-Built with [A-Frame](https://aframe.io).
+A vr study scene built with [A-Frame](https://aframe.io).
 
 ## Setup
 
